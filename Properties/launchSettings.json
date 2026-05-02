@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ChessEngineDebug": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "UCI_DEBUG_RUN_ENABLED": "true"
+      }
+    }
+  }
+}
