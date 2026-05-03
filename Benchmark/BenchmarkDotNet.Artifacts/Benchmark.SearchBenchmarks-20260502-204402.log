@@ -1,0 +1,7 @@
+// Validating benchmarks:
+// Benchmark SearchBenchmarks.GetPossibleMovesBenchmark: DefaultJob
+//    * Benchmarked method `GetPossibleMovesBenchmark` is static. Benchmarks MUST be instance methods, static methods are not supported.
+
+// Benchmark SearchBenchmarks.GetWhitePawnMovesBenchmark: DefaultJob
+//    * Benchmarked method `GetWhitePawnMovesBenchmark` is static. Benchmarks MUST be instance methods, static methods are not supported.
+

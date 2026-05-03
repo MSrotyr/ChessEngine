@@ -5,6 +5,6 @@ namespace ChessEngine.Uci
         public string Name {get;}
         public string Author {get;}
         public void UpdateBoard(string[] coordinateMoves);
-        public string GetBestMoveCoordinates();
+        public (string Move, double Eval) GetBestMoveCoordinates();
     }
 }

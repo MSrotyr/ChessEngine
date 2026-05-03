@@ -14,6 +14,11 @@ namespace ChessEngine.Utils
             return Bmi1.X64.ExtractLowestSetBit(value);
         }
 
+        public static int GetNumSetBits(this ulong value)
+        {
+            return System.Numerics.BitOperations.PopCount(value);
+        }
+
         public static ulong GetTrailingZeroCount(this ulong value)
         {
             return Bmi1.X64.TrailingZeroCount(value);

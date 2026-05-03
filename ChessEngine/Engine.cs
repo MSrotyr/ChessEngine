@@ -1,31 +1,29 @@
+using ChessEngine.Evaluators;
 using ChessEngine.Uci;
 using ChessEngine.Utils;
 
 namespace ChessEngine
 {
-    public class RandomEngine : IUciEngine
+    public class Engine : IUciEngine
     {
         private Board board;
-        private Random random;
-        private bool debugMode;
+        private readonly DepthSearchEvaluator evaluator;
+        private readonly bool debugMode;
 
-        public RandomEngine(bool debugMode = false)
+        public Engine(DepthSearchEvaluator evaluator, bool debugMode = false)
         {
-            this.board = new Board();
-            this.random = new Random();
+            board = new Board();
             this.debugMode = debugMode;
+            this.evaluator = evaluator;
         }
 
         public string Name => "RandomEngine";
         public string Author => "Matt";
 
-        public string GetBestMoveCoordinates()
+        public (string Move, double Eval) GetBestMoveCoordinates()
         {
-            Move[] moves = new Move[256];
-            int movesCnt = Search.GetPossibleMoves(board, moves);
-
-            var moveIndex = random.Next(movesCnt);
-            var move = moves[0];
+            var result = evaluator.Evaluate(board, 5);
+            var move = result.BestMove;
             
             string from = PositionParsing.ConvertBitBoardToCoordinatePosition(move.From);
             string to = PositionParsing.ConvertBitBoardToCoordinatePosition(move.To);
@@ -34,7 +32,7 @@ namespace ChessEngine
                 : Enum.GetName(move.PromotionPeice)!.ToLower();
 
 
-            return from + to + pp;
+            return (from + to + pp, result.Evaluation);
         }
 
         public void UpdateBoard(string[] coordinateMoves)

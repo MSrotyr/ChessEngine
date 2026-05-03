@@ -26,16 +26,16 @@ namespace ChessEngine
         const int KnNNW = 15;
 
         // Attack masks
-        static ulong[] knightAttacks = new ulong[64];
-        static ulong[] basicKingAttacks = new ulong[64]; // Doesn't include castling
+        static ulong[] knightMoves = new ulong[64];
+        static ulong[] basicKingMoves = new ulong[64]; // Doesn't include castling
 
         // Initiate
         static Search()
         {
             for (var i = 0; i < 64; i++)
             {
-                knightAttacks[i] = GenAllKnightMoves(1ul << i);
-                basicKingAttacks[i] = GenAllBasicKingMoves(1ul << i);
+                knightMoves[i] = GenAllKnightMoves(1ul << i);
+                basicKingMoves[i] = GenAllBasicKingMoves(1ul << i);
             }
         }
 
@@ -44,7 +44,6 @@ namespace ChessEngine
             Move[] movesInternal = new Move[256];
 
             var player = board.GetCurrentPlayer();
-            var opponent = player == PlayerEnum.White ? PlayerEnum.Black : PlayerEnum.White;
             ulong empty = ~board.CurrentBoard.Occupied;
             ulong attacked = GetAttackedBitBoard(board.CurrentBoard, player); // TODO only need this if can castle
 
@@ -91,20 +90,14 @@ namespace ChessEngine
 
             // Check validation
             int moveIndex = 0;
-            foreach(var move in movesInternal)
+            for (var i = 0; i < intMoveIndex; i++)
             {
-                board.MakeMove(move);
-
-                ulong kingPosition = player == PlayerEnum.White
-                    ? board.CurrentBoard.WhiteKing
-                    : board.CurrentBoard.BlackKing;
-                    
-                ulong atk = GetAttackedBitBoard(board.CurrentBoard, opponent);
-                board.UndoLastMove();
-                if ((kingPosition & atk) == 0)
+                board.MakeMove(movesInternal[i]);
+                if (!IsPlayerInCheck(board.CurrentBoard, player))
                 {
-                    moves[moveIndex++] = move;
+                    moves[moveIndex++] = movesInternal[i];
                 }
+                board.UndoLastMove();
             }
 
             return moveIndex;
@@ -141,7 +134,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenWhitePawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant)
+        private static ulong GenWhitePawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant)
         {
             ulong moves = 0;
 
@@ -158,7 +151,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static ulong GenWhitePawnAttacks(ulong bb)
+        private static ulong GenWhitePawnAttacks(ulong bb)
         {
             ulong moves = 0;
 
@@ -168,7 +161,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static int GetBlackPawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant, Move[] moves, int moveIndex)
+        private static int GetBlackPawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant, Move[] moves, int moveIndex)
         {
             while (bb != 0)
             {
@@ -199,7 +192,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenBlackPawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant)
+        private static ulong GenBlackPawnMoves(ulong bb, ulong empty, ulong enemyOrEnPassant)
         {
             ulong moves = 0;
 
@@ -216,7 +209,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static ulong GenBlackPawnAttacks(ulong bb)
+        private static ulong GenBlackPawnAttacks(ulong bb)
         {
             ulong moves = 0;
 
@@ -232,7 +225,7 @@ namespace ChessEngine
             {
                 ulong from = bb.GetLsb();
                 var tileIndex = from.GetTrailingZeroCount();
-                ulong attacks = knightAttacks[tileIndex] & emptyOrEnemy;
+                ulong attacks = knightMoves[tileIndex] & emptyOrEnemy;
 
                 while (attacks != 0)
                 {
@@ -247,7 +240,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenAllKnightMoves(ulong bb)
+        private static ulong GenAllKnightMoves(ulong bb)
         {
             ulong moves = 0;
 
@@ -286,7 +279,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenBishopMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
+        private static ulong GenBishopMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
         {
             return
                 GetMovesInDirection(bb, emptyOrEnemy, enemy, CommonBitBoards.NotHFile, NE) |
@@ -315,7 +308,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenRookMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
+        private static ulong GenRookMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
         {
             return
                 GetMovesInDirection(bb, emptyOrEnemy, enemy, CommonBitBoards.AllTiles, N) |
@@ -344,7 +337,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenQueenMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
+        private static ulong GenQueenMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
         {
             return GenBishopMoves(bb, emptyOrEnemy, enemy) | GenRookMoves(bb, emptyOrEnemy, enemy);
         }
@@ -364,7 +357,7 @@ namespace ChessEngine
             {
                 ulong from = bb.GetLsb();
                 var tileIndex = from.GetTrailingZeroCount();
-                ulong kingMoves = (basicKingAttacks[tileIndex] & emptyOrEnemy) 
+                ulong kingMoves = (basicKingMoves[tileIndex] & emptyOrEnemy) 
                 | GenCastlingMoves(hasKingSideCastlingRights, hasQueenSideCastlingRights, occupied, opponentAttacked, player);
 
                 while (kingMoves != 0)
@@ -380,7 +373,7 @@ namespace ChessEngine
             return moveIndex;
         }
 
-        public static ulong GenCastlingMoves(
+        private static ulong GenCastlingMoves(
             bool hasKingSideCastlingRights,
             bool hasQueenSideCastlingRights,
             ulong occupied,
@@ -415,7 +408,7 @@ namespace ChessEngine
             return moves;
         }
 
-        public static bool CanWhiteKingCastleKingSide(ulong occupied, ulong opponentAttacked, bool hasKingSideCastlingRights)
+        private static bool CanWhiteKingCastleKingSide(ulong occupied, ulong opponentAttacked, bool hasKingSideCastlingRights)
         {   
             // hasKingSideCastlingRights - True if king/kingside rook has never moved
             if (!hasKingSideCastlingRights)
@@ -425,7 +418,7 @@ namespace ChessEngine
                 && (CommonBitBoards.WhiteCastleKingSideSafe & opponentAttacked) == 0;
         }
 
-        public static bool CanWhiteKingCastleQueenSide(ulong occupied, ulong opponentAttacked, bool hasQueenSideCastlingRights)
+        private static bool CanWhiteKingCastleQueenSide(ulong occupied, ulong opponentAttacked, bool hasQueenSideCastlingRights)
         {   
             // hasKingSideCastlingRights - True if king/kingside rook has never moved
             if (!hasQueenSideCastlingRights)
@@ -435,7 +428,7 @@ namespace ChessEngine
                 && (CommonBitBoards.WhiteCastleQueenSideSafe & opponentAttacked) == 0;
         }
 
-        public static bool CanBlackKingCastleKingSide(ulong occupied, ulong opponentAttacked, bool hasKingSideCastlingRights)
+        private static bool CanBlackKingCastleKingSide(ulong occupied, ulong opponentAttacked, bool hasKingSideCastlingRights)
         {   
             // hasKingSideCastlingRights - True if king/kingside rook has never moved
             if (!hasKingSideCastlingRights)
@@ -445,7 +438,7 @@ namespace ChessEngine
                 && (CommonBitBoards.BlackCastleKingSideSafe & opponentAttacked) == 0;
         }
 
-        public static bool CanBlackKingCastleQueenSide(ulong occupied, ulong opponentAttacked, bool hasQueenSideCastlingRights)
+        private static bool CanBlackKingCastleQueenSide(ulong occupied, ulong opponentAttacked, bool hasQueenSideCastlingRights)
         {   
             // hasKingSideCastlingRights - True if king/kingside rook has never moved
             if (!hasQueenSideCastlingRights)
@@ -455,7 +448,7 @@ namespace ChessEngine
                 && (CommonBitBoards.BlackCastleQueenSideSafe & opponentAttacked) == 0;
         }
 
-        public static ulong GenAllBasicKingMoves(ulong bb)
+        private static ulong GenAllBasicKingMoves(ulong bb)
         {
             ulong moves = 0;
 
@@ -499,8 +492,21 @@ namespace ChessEngine
             return attacks;
         }
 
+        public static bool IsPlayerInCheck(BitBoards bbs, PlayerEnum player)
+        {
+            var opponent = player == PlayerEnum.White ? PlayerEnum.Black : PlayerEnum.White;
+
+            ulong kingPosition = player == PlayerEnum.White
+                ? bbs.WhiteKing
+                : bbs.BlackKing;
+
+            ulong attacked = GetAttackedBitBoard(bbs, opponent);
+
+            return (kingPosition & attacked) != 0;
+        }
+
         // TODO Return Early possibly quick performance boost
-        public static ulong GetMovesInDirection(ulong bb, ulong emptyOrEnemy, ulong enemy, ulong notBarrierFile, int direction)
+        private static ulong GetMovesInDirection(ulong bb, ulong emptyOrEnemy, ulong enemy, ulong notBarrierFile, int direction)
         {
             // Empty - Can carry on
             // Occupied by player - Not a valid move
@@ -519,7 +525,7 @@ namespace ChessEngine
             return shift1 | shift2 | shift3 | shift4 | shift5 | shift6 | shift7;
         }
 
-        public static ulong Shift(ulong b, int direction)
+        private static ulong Shift(ulong b, int direction)
         {
             return direction > 0 ? b << direction : b >> Math.Abs(direction);
         }

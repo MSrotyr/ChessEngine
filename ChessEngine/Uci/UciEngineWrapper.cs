@@ -177,8 +177,9 @@ namespace ChessEngine
 
         public void HandleGoMessage(string msg)
         {
-            var coords = Engine.GetBestMoveCoordinates();
-            SendMessage(UciEngineCommand.BestMove, coords);
+            var res = Engine.GetBestMoveCoordinates();
+            SendMessage(UciEngineCommand.BestMove, res.Move);
+            SendMessage(UciEngineCommand.Info, $"score cp {res.Eval * 100}");
         }
 
         public void HandleUnknownMessage(string msg)
