@@ -7,6 +7,19 @@
 			"group": "build",
 			"problemMatcher": [],
 			"label": "dotnet: build"
-		}
+		},
+		{
+			"label": "build Benchmark (Release)",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}/Benchmark/Benchmark.csproj",
+				"-c",
+				"Release"
+			],
+			"group": "build",
+			"problemMatcher": "$msCompile"
+			}
 	]
 }

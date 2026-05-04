@@ -7,13 +7,6 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "UCI_DEBUG_RUN_ENABLED": "true"
       }
-    },
-    "Benchmark": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-      }
     }
   }
 }

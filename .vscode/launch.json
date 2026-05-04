@@ -12,16 +12,16 @@
             "cwd": "${workspaceFolder}/ChessEngine",
             "launchSettingsFilePath": "${workspaceFolder}/Properties/launchSettings.json",
             "launchSettingsProfile": "ChessEngineDebug",
-            "preLaunchTask": "dotnet: build ${workspaceFolder}/ChessEngine/ChessEngine.csproj"
+            "preLaunchTask": "dotnet: build"
         },
         {
-            "name": "Benchmark",
+            // Use Ctrl F5 in VS Code to run without debugger
+            "name": "Benchmark (Release)",
             "type": "coreclr",
             "request": "launch",
-            "program": "${workspaceFolder}/Benchmark/bin/Debug/net10.0/Benchmark.dll",
+            "program": "${workspaceFolder}/Benchmark/bin/Release/net10.0/Benchmark.dll",
             "cwd": "${workspaceFolder}/Benchmark",
-            "launchSettingsFilePath": "${workspaceFolder}/Properties/launchSettings.json",
-            "launchSettingsProfile": "Benchmark",
+            "preLaunchTask": "build Benchmark (Release)"
         }
     ]
 }
