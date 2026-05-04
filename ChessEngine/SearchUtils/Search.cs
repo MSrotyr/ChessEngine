@@ -505,22 +505,21 @@ namespace ChessEngine.SearchUtils
             return (kingPosition & attacked) != 0;
         }
 
-        // TODO Return Early possibly quick performance boost
         private static ulong GetMovesInDirection(ulong bb, ulong emptyOrEnemy, ulong enemy, ulong notBarrierFile, int direction)
         {
             // Empty - Can carry on
             // Occupied by player - Not a valid move
             // Occupied by enemy - Valid move but cannot continue any further in direction
-
             var notEnemy = ~enemy;
+            var notBlocker = notBarrierFile & notEnemy;
 
             var shift1 = Shift(bb & notBarrierFile, direction) & emptyOrEnemy;
-            var shift2 = Shift(shift1 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
-            var shift3 = Shift(shift2 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
-            var shift4 = Shift(shift3 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
-            var shift5 = Shift(shift4 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
-            var shift6 = Shift(shift5 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
-            var shift7 = Shift(shift6 & notBarrierFile & notEnemy, direction) & emptyOrEnemy;
+            var shift2 = Shift(shift1 & notBlocker, direction) & emptyOrEnemy;
+            var shift3 = Shift(shift2 & notBlocker, direction) & emptyOrEnemy;
+            var shift4 = Shift(shift3 & notBlocker, direction) & emptyOrEnemy;
+            var shift5 = Shift(shift4 & notBlocker, direction) & emptyOrEnemy;
+            var shift6 = Shift(shift5 & notBlocker, direction) & emptyOrEnemy;
+            var shift7 = Shift(shift6 & notBlocker, direction) & emptyOrEnemy;
 
             return shift1 | shift2 | shift3 | shift4 | shift5 | shift6 | shift7;
         }
