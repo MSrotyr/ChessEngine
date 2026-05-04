@@ -1,5 +1,5 @@
 using System.Reflection.Metadata;
-using ChessEngine.Utils;
+using ChessEngine.SearchUtils;
 using Player;
 
 namespace ChessEngine
@@ -68,9 +68,6 @@ namespace ChessEngine
                     else if ((move.From & CommonBitBoards.Rank2) != 0 && (move.To & CommonBitBoards.Rank4) != 0)
                     {
                         CurrentBoard.EnPassant = move.From << 8;
-                    } else
-                    {
-                        CurrentBoard.EnPassant = 0UL;
                     }
                 }
 
@@ -169,9 +166,6 @@ namespace ChessEngine
                     else if ((move.From & CommonBitBoards.Rank7) != 0 && (move.To & CommonBitBoards.Rank5) != 0)
                     {
                         CurrentBoard.EnPassant = move.From >> 8;
-                    } else
-                    {
-                        CurrentBoard.EnPassant = 0UL;
                     }
                 }
 
@@ -210,16 +204,16 @@ namespace ChessEngine
                     CurrentBoard.HasBlackQueenSideCastlingRights = false;
 
                     // Move rook if castled
-                    if (move.From == CommonBitBoards.WhiteKingHome)
+                    if (move.From == CommonBitBoards.BlackKingHome)
                     {
-                        if (move.To == CommonBitBoards.WhiteKingCastleKingSide)
+                        if (move.To == CommonBitBoards.BlackKingCastleKingSide)
                         {
-                            CurrentBoard.WhiteRooks = (CurrentBoard.WhiteRooks & ~CommonBitBoards.WhiteRookKingSideHome) | CommonBitBoards.WhiteRookCastleKingSide;
+                            CurrentBoard.BlackRooks = (CurrentBoard.BlackRooks & ~CommonBitBoards.BlackRookKingSideHome) | CommonBitBoards.BlackRookCastleKingSide;
                         }
 
-                        else if (move.To == CommonBitBoards.WhiteKingCastleQueenSide)
+                        else if (move.To == CommonBitBoards.BlackKingCastleQueenSide)
                         {
-                            CurrentBoard.WhiteRooks = (CurrentBoard.WhiteRooks & ~CommonBitBoards.WhiteRookQueenSideHome) | CommonBitBoards.WhiteRookCastleQueenSide;
+                            CurrentBoard.BlackRooks = (CurrentBoard.BlackRooks & ~CommonBitBoards.BlackRookQueenSideHome) | CommonBitBoards.BlackRookCastleQueenSide;
                         }
                     }
                 }
@@ -242,6 +236,12 @@ namespace ChessEngine
                 CurrentBoard.BlackRooks | CurrentBoard.BlackQueens | CurrentBoard.BlackKing;
 
             CurrentBoard.Occupied = CurrentBoard.WhiteOccupied | CurrentBoard.BlackOccupied;
+
+            // Reset en passant if not set by the current move
+            if (CurrentBoard.EnPassant == oldBoard.EnPassant)
+            {
+                CurrentBoard.EnPassant = 0UL;
+            }
 
             MoveHistory.Push(oldBoard);
         }

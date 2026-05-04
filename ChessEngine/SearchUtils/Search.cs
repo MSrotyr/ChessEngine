@@ -1,7 +1,7 @@
 using ChessEngine.Utils;
 using Player;
 
-namespace ChessEngine
+namespace ChessEngine.SearchUtils
 {
     public static class Search
     {

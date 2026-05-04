@@ -1,4 +1,4 @@
-namespace ChessEngine.Utils
+namespace ChessEngine.SearchUtils
 {
     public static class CommonBitBoards
     {

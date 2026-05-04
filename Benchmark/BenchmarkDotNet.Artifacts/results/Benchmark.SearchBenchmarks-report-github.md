@@ -8,12 +8,7 @@ AMD Ryzen 5 9600X 5.02GHz, 1 CPU, 12 logical and 6 physical cores
 
 
 ```
-| Method                     | Mean          | Error      | StdDev     |
-|--------------------------- |--------------:|-----------:|-----------:|
-| GetPossibleMovesBenchmark  | 1,097.0111 ns | 16.5304 ns | 14.6538 ns |
-| GetWhitePawnMovesBenchmark |    15.0396 ns |  0.0691 ns |  0.0577 ns |
-| GetKnightMovesBenchmark    |     2.9135 ns |  0.0226 ns |  0.0189 ns |
-| GetBishopMovesBenchmark    |    15.1973 ns |  0.0503 ns |  0.0446 ns |
-| GetRookMovesBenchmark      |    15.6575 ns |  0.0289 ns |  0.0256 ns |
-| GetQueenMovesBenchmark     |    13.7176 ns |  0.0153 ns |  0.0144 ns |
-| GetKingMovesBenchmark      |     0.2131 ns |  0.0025 ns |  0.0021 ns |
+| Method                        | Mean      | Error     | StdDev    | Median    |
+|------------------------------ |----------:|----------:|----------:|----------:|
+| GetRookMovesBenchmark         | 1.9731 ns | 0.0085 ns | 0.0075 ns | 1.9748 ns |
+| GetRookMovesBenchmarkBaseline | 0.0426 ns | 0.0192 ns | 0.0401 ns | 0.0230 ns |
