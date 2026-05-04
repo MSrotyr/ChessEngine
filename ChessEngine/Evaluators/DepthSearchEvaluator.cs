@@ -32,10 +32,6 @@ namespace ChessEngine.Evaluators
                     MoveHistory = new Stack<BitBoards>(board.MoveHistory)
                 };
 
-                // DEBUG
-                // var from = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].From);
-                // var to = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].To);
-
                 boardCopy.MakeMove(moves[i]);
                 res[i] = EvaluateInternal(boardCopy, depth - 1);
                 boardCopy.UndoLastMove();
@@ -46,8 +42,8 @@ namespace ChessEngine.Evaluators
             for (var i = 0; i < movesCnt; i++)
             {
                 // DEBUG
-                var from = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].From);
-                var to = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].To);
+                // var from = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].From);
+                // var to = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].To);
 
                 var eval = res[i];
 
@@ -83,14 +79,19 @@ namespace ChessEngine.Evaluators
             // else stalemate => draw
             if (movesCnt == 0)
             {
-                return Search.IsPlayerInCheck(board.CurrentBoard, player) ? bestMoveEval : 0;
+                // Added to make the engine play the fastest mate if multiple exist
+                int depthAdjustment = player == Player.PlayerEnum.White ? depth : -depth;
+
+                return Search.IsPlayerInCheck(board.CurrentBoard, player) 
+                    ? (bestMoveEval + depthAdjustment)
+                    : 0;
             }
 
             for (var i = 0; i < movesCnt; i++)
             {
                 // DEBUG
-                var from = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].From);
-                var to = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].To);
+                // var from = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].From);
+                // var to = PositionParsing.ConvertBitBoardToCoordinatePosition(moves[i].To);
 
                 board.MakeMove(moves[i]);
                 var eval = EvaluateInternal(board, depth - 1);

@@ -472,7 +472,16 @@ namespace ChessEngine.SearchUtils
             {
                 ulong emptyOrEnemy = ~bbs.WhiteOccupied;
                 attacks |= GenWhitePawnAttacks(bbs.WhitePawns);
-                attacks |= GenAllKnightMoves(bbs.WhiteKnights);
+
+                // Should be faster than using shifts provided the number of knights not weirdly high
+                while (bbs.WhiteKnights != 0)
+                {
+                    var tileIndex = bbs.WhiteKnights.GetTrailingZeroCount();
+                    attacks |= knightMoves[tileIndex];
+                    bbs.WhiteKnights = bbs.WhiteKnights.PopLsb();
+                }
+
+
                 attacks |= GenBishopMoves(bbs.WhiteBishops, emptyOrEnemy, bbs.BlackOccupied);
                 attacks |= GenRookMoves(bbs.WhiteRooks, emptyOrEnemy, bbs.BlackOccupied);
                 attacks |= GenQueenMoves(bbs.WhiteQueens, emptyOrEnemy, bbs.BlackOccupied);
@@ -482,7 +491,15 @@ namespace ChessEngine.SearchUtils
             {
                 ulong emptyOrEnemy = ~bbs.BlackOccupied;
                 attacks |= GenBlackPawnAttacks(bbs.BlackPawns);
-                attacks |= GenAllKnightMoves(bbs.BlackKnights);
+                
+                // Should be faster than using shifts provided the number of knights not weirdly high
+                while (bbs.BlackKnights != 0)
+                {
+                    var tileIndex = bbs.BlackKnights.GetTrailingZeroCount();
+                    attacks |= knightMoves[tileIndex];
+                    bbs.BlackKnights = bbs.BlackKnights.PopLsb();
+                }
+
                 attacks |= GenBishopMoves(bbs.BlackBishops, emptyOrEnemy, bbs.WhiteOccupied);
                 attacks |= GenRookMoves(bbs.BlackRooks, emptyOrEnemy, bbs.WhiteOccupied);
                 attacks |= GenQueenMoves(bbs.BlackQueens, emptyOrEnemy, bbs.WhiteOccupied);
