@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 
 namespace ChessEngine.Utils

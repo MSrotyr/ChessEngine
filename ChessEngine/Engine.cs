@@ -52,7 +52,7 @@ namespace ChessEngine
 
             if (debugMode)
             {
-                new ConsoleChessPrinter().Print(board);
+                ConsoleChessPrinter.Print(board);
             }
         }
     }

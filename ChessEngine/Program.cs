@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using ChessEngine;
 using ChessEngine.Evaluators;
+using ChessEngine.SearchUtils;
+
+MagicRook.Initialize(MagicNumbers.RookMagicNumbers);
 
 var debugPath = Path.Join(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location), "debug.txt");
 var evaluator = new DepthSearchEvaluator(new PeiceCounterEvaluator());

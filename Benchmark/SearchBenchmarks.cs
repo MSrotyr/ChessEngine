@@ -17,6 +17,7 @@ namespace Benchmark
 
         public SearchBenchmarks()
         {
+            MagicRook.Initialize(MagicNumbers.RookMagicNumbers);
         }
 
         [Benchmark]
@@ -25,46 +26,33 @@ namespace Benchmark
             Search.GetPossibleMoves(new Board(), moves);
         }
 
-        [Benchmark]
-        public void GetWhitePawnMovesBenchmark()
-        {
-            
-            Search.GetWhitePawnMoves(board.CurrentBoard.WhitePawns, empty, enemyOrEnPassant, moves, 0);
-        }
+        // [Benchmark]
+        // public void GetWhitePawnMovesBenchmark()
+        // {
 
-        [Benchmark]
-        public void GetKnightMovesBenchmark()
-        {
-            
-            Search.GetKnightMoves(board.CurrentBoard.WhiteKnights, emptyOrEnemy, moves, 0);
-        }
+        //     Search.GetWhitePawnMoves(board.CurrentBoard.WhitePawns, empty, enemyOrEnPassant, moves, 0);
+        // }
 
-        [Benchmark]
-        public void GetBishopMovesBenchmark()
-        {
-            
-            Search.GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
-        }
+        // [Benchmark]
+        // public void GetBishopMovesBenchmark()
+        // {
 
-        [Benchmark]
-        public void GetRookMovesBenchmark()
-        {
-            Search.GetRookMoves(board.CurrentBoard.WhiteRooks, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
-        }
+        //     Search.GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
+        // }
 
-        [Benchmark]
-        public void GetQueenMovesBenchmark()
-        {
-            
-            Search.GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
-        }
+        // [Benchmark]
+        // public void GetQueenMovesBenchmark()
+        // {
 
-        [Benchmark]
-        public void GetKingMovesBenchmark()
-        {
-            
-            Search.GetKingMoves(board.CurrentBoard.WhiteKing, emptyOrEnemy, attacked, board.CurrentBoard.Occupied, board.CurrentBoard.HasWhiteKingSideCastlingRights, board.CurrentBoard.HasWhiteQueenSideCastlingRights, Player.PlayerEnum.White, moves, 0);
-        }
+        //     Search.GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
+        // }
+
+        // [Benchmark]
+        // public void GetKingMovesBenchmark()
+        // {
+
+        //     Search.GetKingMoves(board.CurrentBoard.WhiteKing, emptyOrEnemy, attacked, board.CurrentBoard.Occupied, board.CurrentBoard.HasWhiteKingSideCastlingRights, board.CurrentBoard.HasWhiteQueenSideCastlingRights, Player.PlayerEnum.White, moves, 0);
+        // }
 
         // All moves will pass in starting position
         [Benchmark]

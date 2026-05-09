@@ -1,8 +1,8 @@
 namespace ChessEngine
 {
-    public class ConsoleChessPrinter : IChessPrinter
+    public static class ConsoleChessPrinter
     {
-        public void Print(Board b)
+        public static void Print(Board b)
         {
             for (int rank = 7; rank >= 0; rank--)
             {
@@ -23,7 +23,7 @@ namespace ChessEngine
             Console.WriteLine("\n   a b c d e f g h");
         }
 
-        public void PrintBitboard(ulong bitboard)
+        public static void PrintBitboard(ulong bitboard)
         {
             for (int rank = 7; rank >= 0; rank--)
             {
@@ -43,7 +43,30 @@ namespace ChessEngine
             Console.WriteLine();
         }
 
-        private char GetPieceChar(BitBoards b, ulong sq)
+        public static string BitboardToString(ulong bitboard)
+        {
+            var str = "";
+            for (int rank = 7; rank >= 0; rank--)
+            {
+                str += rank + 1 + "  ";
+
+                for (int file = 0; file < 8; file++)
+                {
+                    int square = rank * 8 + file;
+
+                    ulong mask = 1UL << square;
+
+                    str += (bitboard & mask) != 0 ? "1 " : "0 ";
+                }
+
+                str += Environment.NewLine;
+            }
+            str += Environment.NewLine;
+
+            return str;
+        }
+
+        private static char GetPieceChar(BitBoards b, ulong sq)
         {
             if ((b.WhitePawns & sq) != 0) return 'P';
             if ((b.WhiteKnights & sq) != 0) return 'N';
