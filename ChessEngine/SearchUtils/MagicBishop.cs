@@ -3,7 +3,7 @@ using ChessEngine.Utils;
 
 namespace ChessEngine.SearchUtils
 {
-    public static class MagicRook
+    public static class MagicBishop
     {
         private static ulong[] moveBoards = [];
         private static readonly Magic[] magic = new Magic[64];
@@ -16,10 +16,10 @@ namespace ChessEngine.SearchUtils
                 var bb = 1UL << i;
 
                 ulong blockerMask = 
-                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.AllTiles, 8) |  // N
-                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.NotHFile, 1) |  // E
-                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.AllTiles, -8) | // S
-                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.NotAFile, -1);  // W
+                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.AllTiles, 9) |  // NE
+                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.NotHFile, -7) |  // SE
+                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.AllTiles, -9) | // SW
+                    Search.GetMovesInDirection(bb, CommonBitBoards.AllTiles, CommonBitBoards.NotAFile, 7);  // NW
 
                 // Remove edges
                 if ((bb & CommonBitBoards.Rank1) == 0)
@@ -38,7 +38,7 @@ namespace ChessEngine.SearchUtils
 
                 foreach(var blocker in blockers)
                 {
-                    var moves = Search.GenRookMoves(bb, CommonBitBoards.AllTiles, blocker);
+                    var moves = Search.GenBishopMoves(bb, CommonBitBoards.AllTiles, blocker);
                     blockerMoveBoardMap.Add(blocker, moves);
                 }
 

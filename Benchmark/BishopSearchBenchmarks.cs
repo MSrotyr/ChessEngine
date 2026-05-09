@@ -5,21 +5,21 @@ using ChessEngine.SearchUtils;
 namespace Benchmark
 {
     [MarkdownExporterAttribute.GitHub]
-    public class KnightSearchBenchmarks
+    public class BishopSearchBenchmarks
     {
         private static Move[] moves = new Move[256];
         private static Board board = new();
         private static ulong emptyOrEnemy = ~board.CurrentBoard.WhiteOccupied;
 
-        public KnightSearchBenchmarks()
+        public BishopSearchBenchmarks()
         {
+            MagicBishop.Initialize(MagicNumbers.BishopMagicNumbers);
         }
 
-        [Benchmark]
-        public void GetKnightMovesBenchmark()
+        [Benchmark(Baseline = true)]
+        public void GetBishopMovesBenchmark()
         {
-
-            Search.GetKnightMoves(board.CurrentBoard.WhiteKnights, emptyOrEnemy, moves, 0);
+            Search.GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.Occupied, moves, 0);
         }
     }
 }

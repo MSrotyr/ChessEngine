@@ -4,6 +4,7 @@ using ChessEngine.SearchUtils;
 
 namespace Benchmark
 {
+    [MarkdownExporterAttribute.GitHub]
     public class SearchBenchmarks
     {
         private static Move[] moves = new Move[256];
@@ -17,6 +18,7 @@ namespace Benchmark
 
         public SearchBenchmarks()
         {
+            MagicBishop.Initialize(MagicNumbers.BishopMagicNumbers);
             MagicRook.Initialize(MagicNumbers.RookMagicNumbers);
         }
 
@@ -26,33 +28,26 @@ namespace Benchmark
             Search.GetPossibleMoves(new Board(), moves);
         }
 
-        // [Benchmark]
-        // public void GetWhitePawnMovesBenchmark()
-        // {
+        [Benchmark]
+        public void GetWhitePawnMovesBenchmark()
+        {
 
-        //     Search.GetWhitePawnMoves(board.CurrentBoard.WhitePawns, empty, enemyOrEnPassant, moves, 0);
-        // }
+            Search.GetWhitePawnMoves(board.CurrentBoard.WhitePawns, empty, enemyOrEnPassant, moves, 0);
+        }
 
-        // [Benchmark]
-        // public void GetBishopMovesBenchmark()
-        // {
+        [Benchmark]
+        public void GetQueenMovesBenchmark()
+        {
 
-        //     Search.GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
-        // }
+            Search.GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.Occupied, moves, 0);
+        }
 
-        // [Benchmark]
-        // public void GetQueenMovesBenchmark()
-        // {
+        [Benchmark]
+        public void GetKingMovesBenchmark()
+        {
 
-        //     Search.GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
-        // }
-
-        // [Benchmark]
-        // public void GetKingMovesBenchmark()
-        // {
-
-        //     Search.GetKingMoves(board.CurrentBoard.WhiteKing, emptyOrEnemy, attacked, board.CurrentBoard.Occupied, board.CurrentBoard.HasWhiteKingSideCastlingRights, board.CurrentBoard.HasWhiteQueenSideCastlingRights, Player.PlayerEnum.White, moves, 0);
-        // }
+            Search.GetKingMoves(board.CurrentBoard.WhiteKing, emptyOrEnemy, attacked, board.CurrentBoard.Occupied, board.CurrentBoard.HasWhiteKingSideCastlingRights, board.CurrentBoard.HasWhiteQueenSideCastlingRights, Player.PlayerEnum.White, moves, 0);
+        }
 
         // All moves will pass in starting position
         [Benchmark]

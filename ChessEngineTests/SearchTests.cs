@@ -7,6 +7,7 @@ public class SearchTests
 {
     public SearchTests()
     {
+        MagicBishop.Initialize(MagicNumbers.BishopMagicNumbers);
         MagicRook.Initialize(MagicNumbers.RookMagicNumbers);
     }
 

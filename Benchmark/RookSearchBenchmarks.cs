@@ -4,6 +4,7 @@ using ChessEngine.SearchUtils;
 
 namespace Benchmark
 {
+    [MarkdownExporterAttribute.GitHub]
     public class RookSearchBenchmarks
     {
         private static Move[] moves = new Move[256];
@@ -18,7 +19,7 @@ namespace Benchmark
         [Benchmark(Baseline = true)]
         public void GetRookMovesBenchmark()
         {
-            Search.GetRookMoves(board.CurrentBoard.WhiteRooks, emptyOrEnemy, board.CurrentBoard.BlackOccupied, moves, 0);
+            Search.GetRookMoves(board.CurrentBoard.WhiteRooks, emptyOrEnemy, board.CurrentBoard.Occupied, moves, 0);
         }
     }
 }

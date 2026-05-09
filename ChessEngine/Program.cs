@@ -3,6 +3,7 @@ using ChessEngine;
 using ChessEngine.Evaluators;
 using ChessEngine.SearchUtils;
 
+MagicBishop.Initialize(MagicNumbers.BishopMagicNumbers);
 MagicRook.Initialize(MagicNumbers.RookMagicNumbers);
 
 var debugPath = Path.Join(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location), "debug.txt");

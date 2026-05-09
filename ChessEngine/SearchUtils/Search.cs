@@ -54,9 +54,9 @@ namespace ChessEngine.SearchUtils
                 ulong enemyOrEnPassant = board.CurrentBoard.BlackOccupied | board.CurrentBoard.EnPassant;
                 intMoveIndex = GetWhitePawnMoves(board.CurrentBoard.WhitePawns, empty, enemyOrEnPassant, movesInternal, intMoveIndex);
                 intMoveIndex = GetKnightMoves(board.CurrentBoard.WhiteKnights, emptyOrEnemy, movesInternal, intMoveIndex);
-                intMoveIndex = GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.BlackOccupied, movesInternal, intMoveIndex);
+                intMoveIndex = GetBishopMoves(board.CurrentBoard.WhiteBishops, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
                 intMoveIndex = GetRookMoves(board.CurrentBoard.WhiteRooks, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
-                intMoveIndex = GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.BlackOccupied, movesInternal, intMoveIndex);
+                intMoveIndex = GetQueenMoves(board.CurrentBoard.WhiteQueens, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
                 intMoveIndex = GetKingMoves(
                     board.CurrentBoard.WhiteKing,
                     emptyOrEnemy,
@@ -73,9 +73,9 @@ namespace ChessEngine.SearchUtils
                 ulong enemyOrEnPassant = board.CurrentBoard.WhiteOccupied | board.CurrentBoard.EnPassant;
                 intMoveIndex = GetBlackPawnMoves(board.CurrentBoard.BlackPawns, empty, enemyOrEnPassant, movesInternal, intMoveIndex);
                 intMoveIndex = GetKnightMoves(board.CurrentBoard.BlackKnights, emptyOrEnemy, movesInternal, intMoveIndex);
-                intMoveIndex = GetBishopMoves(board.CurrentBoard.BlackBishops, emptyOrEnemy, board.CurrentBoard.WhiteOccupied, movesInternal, intMoveIndex);
+                intMoveIndex = GetBishopMoves(board.CurrentBoard.BlackBishops, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
                 intMoveIndex = GetRookMoves(board.CurrentBoard.BlackRooks, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
-                intMoveIndex = GetQueenMoves(board.CurrentBoard.BlackQueens, emptyOrEnemy, board.CurrentBoard.WhiteOccupied, movesInternal, intMoveIndex);
+                intMoveIndex = GetQueenMoves(board.CurrentBoard.BlackQueens, emptyOrEnemy, board.CurrentBoard.Occupied, movesInternal, intMoveIndex);
                 intMoveIndex = GetKingMoves(
                     board.CurrentBoard.BlackKing,
                     emptyOrEnemy,
@@ -259,18 +259,19 @@ namespace ChessEngine.SearchUtils
             return moves;
         }
 
-        public static int GetBishopMoves(ulong bb, ulong emptyOrEnemy, ulong enemy, Move[] moves, int moveIndex)
+        public static int GetBishopMoves(ulong bb, ulong emptyOrEnemy, ulong occupied, Move[] moves, int moveIndex)
         {
             while (bb != 0)
             {
                 ulong from = bb.GetLsb();
-                ulong attacks = GenBishopMoves(from, emptyOrEnemy, enemy);
+                var tileIndex = from.GetTrailingZeroCount();
+                ulong bishopMoves = MagicBishop.GetMoves((int)tileIndex, occupied) & emptyOrEnemy;
 
-                while (attacks != 0)
+                while (bishopMoves != 0)
                 {
-                    ulong to = attacks.GetLsb();
+                    ulong to = bishopMoves.GetLsb();
                     moves[moveIndex++] = new Move(from, to);
-                    attacks = attacks.PopLsb();
+                    bishopMoves = bishopMoves.PopLsb();
                 }
 
                 bb = bb.PopLsb();
@@ -279,7 +280,7 @@ namespace ChessEngine.SearchUtils
             return moveIndex;
         }
 
-        private static ulong GenBishopMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
+        public static ulong GenBishopMoves(ulong bb, ulong emptyOrEnemy, ulong enemy)
         {
             var notEnemy = ~enemy;
             return
@@ -295,14 +296,13 @@ namespace ChessEngine.SearchUtils
             {
                 ulong from = bb.GetLsb();
                 var tileIndex = from.GetTrailingZeroCount();
+                ulong rookMoves = MagicRook.GetMoves((int)tileIndex, occupied) & emptyOrEnemy;
 
-                ulong attacks = MagicRook.GetRookMoves((int)tileIndex, occupied) & emptyOrEnemy;
-
-                while (attacks != 0)
+                while (rookMoves != 0)
                 {
-                    ulong to = attacks.GetLsb();
+                    ulong to = rookMoves.GetLsb();
                     moves[moveIndex++] = new Move(from, to);
-                    attacks = attacks.PopLsb();
+                    rookMoves = rookMoves.PopLsb();
                 }
 
                 bb = bb.PopLsb();
@@ -321,18 +321,21 @@ namespace ChessEngine.SearchUtils
                 GetMovesInDirection(bb, emptyOrEnemy, CommonBitBoards.NotAFile & notEnemy, W);
         }
 
-        public static int GetQueenMoves(ulong bb, ulong emptyOrEnemy, ulong enemy, Move[] moves, int moveIndex)
+        public static int GetQueenMoves(ulong bb, ulong emptyOrEnemy, ulong occupied, Move[] moves, int moveIndex)
         {
             while (bb != 0)
             {
                 ulong from = bb.GetLsb();
-                ulong attacks = GenQueenMoves(from, emptyOrEnemy, enemy);
+                var tileIndex = from.GetTrailingZeroCount();
+                ulong bishopMoves = MagicBishop.GetMoves((int)tileIndex, occupied);
+                ulong rookMoves = MagicRook.GetMoves((int)tileIndex, occupied);
+                ulong queenMoves = (bishopMoves | rookMoves) & emptyOrEnemy;
 
-                while (attacks != 0)
+                while (queenMoves != 0)
                 {
-                    ulong to = attacks.GetLsb();
+                    ulong to = queenMoves.GetLsb();
                     moves[moveIndex++] = new Move(from, to);
-                    attacks = attacks.PopLsb();
+                    queenMoves = queenMoves.PopLsb();
                 }
 
                 bb = bb.PopLsb();
@@ -474,7 +477,6 @@ namespace ChessEngine.SearchUtils
             ulong attacks = 0;
             if (player == PlayerEnum.White)
             {
-                ulong emptyOrEnemy = ~bbs.WhiteOccupied;
                 attacks |= GenWhitePawnAttacks(bbs.WhitePawns);
 
                 // Should be faster than using shifts provided the number of knights not weirdly high
@@ -485,22 +487,32 @@ namespace ChessEngine.SearchUtils
                     bbs.WhiteKnights = bbs.WhiteKnights.PopLsb();
                 }
 
-
-                attacks |= GenBishopMoves(bbs.WhiteBishops, emptyOrEnemy, bbs.BlackOccupied);
+                while (bbs.WhiteBishops != 0)
+                {
+                    var tileIndex = (int)bbs.WhiteBishops.GetTrailingZeroCount();
+                    attacks |= MagicBishop.GetMoves(tileIndex, bbs.Occupied);
+                    bbs.WhiteBishops = bbs.WhiteBishops.PopLsb();
+                }
 
                 while (bbs.WhiteRooks != 0)
                 {
                     var tileIndex = (int)bbs.WhiteRooks.GetTrailingZeroCount();
-                    attacks |= MagicRook.GetRookMoves(tileIndex, bbs.Occupied);
+                    attacks |= MagicRook.GetMoves(tileIndex, bbs.Occupied);
                     bbs.WhiteRooks = bbs.WhiteRooks.PopLsb();
                 }
 
-                attacks |= GenQueenMoves(bbs.WhiteQueens, emptyOrEnemy, bbs.BlackOccupied);
+                while (bbs.WhiteQueens != 0)
+                {
+                    var tileIndex = (int)bbs.WhiteQueens.GetTrailingZeroCount();
+                    attacks |= MagicBishop.GetMoves(tileIndex, bbs.Occupied);
+                    attacks |= MagicRook.GetMoves(tileIndex, bbs.Occupied);
+                    bbs.WhiteQueens = bbs.WhiteQueens.PopLsb();
+                }
+
                 attacks |= GenAllBasicKingMoves(bbs.WhiteKing);
             } 
             else
             {
-                ulong emptyOrEnemy = ~bbs.BlackOccupied;
                 attacks |= GenBlackPawnAttacks(bbs.BlackPawns);
                 
                 // Should be faster than using shifts provided the number of knights not weirdly high
@@ -511,16 +523,28 @@ namespace ChessEngine.SearchUtils
                     bbs.BlackKnights = bbs.BlackKnights.PopLsb();
                 }
 
-                attacks |= GenBishopMoves(bbs.BlackBishops, emptyOrEnemy, bbs.WhiteOccupied);
+                while (bbs.BlackBishops != 0)
+                {
+                    var tileIndex = (int)bbs.BlackBishops.GetTrailingZeroCount();
+                    attacks |= MagicBishop.GetMoves(tileIndex, bbs.Occupied);
+                    bbs.BlackBishops = bbs.BlackBishops.PopLsb();
+                }
                 
                 while (bbs.BlackRooks != 0)
                 {
                     var tileIndex = (int)bbs.BlackRooks.GetTrailingZeroCount();
-                    attacks |= MagicRook.GetRookMoves(tileIndex, bbs.Occupied);
+                    attacks |= MagicRook.GetMoves(tileIndex, bbs.Occupied);
                     bbs.BlackRooks = bbs.BlackRooks.PopLsb();
                 }
 
-                attacks |= GenQueenMoves(bbs.BlackQueens, emptyOrEnemy, bbs.WhiteOccupied);
+                while (bbs.BlackQueens != 0)
+                {
+                    var tileIndex = (int)bbs.BlackQueens.GetTrailingZeroCount();
+                    attacks |= MagicBishop.GetMoves(tileIndex, bbs.Occupied);
+                    attacks |= MagicRook.GetMoves(tileIndex, bbs.Occupied);
+                    bbs.BlackQueens = bbs.BlackQueens.PopLsb();
+                }
+
                 attacks |= GenAllBasicKingMoves(bbs.BlackKing);
             }
 
